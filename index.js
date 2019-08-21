@@ -18,13 +18,22 @@ if( process.env.MODE === 'LOCAL' ){
 
 const s3 = new AWS.S3();
 
-exports.handler = (event, context) => 
+exports.handler = (event, context) => {
+  let filename;
+  
+  if(event.isBase64Encoded) {
+    let buff = new Buffer(event.body, 'base64');
+    filename = JSON.parse(buff.toString('ascii')).filename;
+  } else {
+    filename = JSON.parse(event.body).filename;
+  }
+  
   s3.getSignedUrl('putObject', {
-    Bucket: 'lambda-film-talk-upload',
-    Key: event.filename,
+    Bucket: TO_BUCKET,
+    Key: filename,
     ContentType: 'multipart/form-data',
     Expires: 300
   }, (err, url)=>
     (err)? context.fail(err): context.succeed(url)
   );
-
+}
