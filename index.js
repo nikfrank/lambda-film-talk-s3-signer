@@ -34,6 +34,9 @@ exports.handler = (event, context) => {
     ContentType: 'multipart/form-data',
     Expires: 300
   }, (err, url)=>
-    (err)? context.fail(err): context.succeed(url)
+    (err)? context.fail(err): context.succeed({
+      statusCode: 200,
+      body: url
+    })
   );
 }
